@@ -1,0 +1,25 @@
+{
+  "name": "opentui-line-number-example",
+  "version": "1.0.0",
+  "description": "OpenTUI line number example with hot reload",
+  "type": "module",
+  "scripts": {
+    "start": "bun run src/index.tsx",
+    "dev": "bun run src/hmr/dev.ts src/App.tsx",
+    "dev:watch": "bun --watch run src/index.tsx"
+  },
+  "dependencies": {
+    "@opentui/core": "^0.1.65",
+    "@opentui/react": "^0.1.65",
+    "@parcel/watcher": "^2.5.1",
+    "@swc/core": "^1.10.4",
+    "react": "^19.0.0",
+    "react-refresh": "^0.14.2"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.5",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "typescript": "^5.7.0"
+  }
+}
