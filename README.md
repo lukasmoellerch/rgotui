@@ -4,7 +4,13 @@ A terminal UI for [ripgrep](https://github.com/BurntSushi/ripgrep) built with [O
 
 ![Screenshot](./assets/screenshot.png)
 
-## Usage
+## Try it
+
+```bash
+bunx github:lukasmoellerch/rgotui
+```
+
+## Development
 
 ```bash
 bun install
