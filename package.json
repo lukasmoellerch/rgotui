@@ -1,7 +1,7 @@
 {
-  "name": "opentui-line-number-example",
+  "name": "rgotui",
   "version": "1.0.0",
-  "description": "OpenTUI line number example with hot reload",
+  "description": "rgotui - OpenTUI app with hot reload",
   "type": "module",
   "scripts": {
     "start": "bun run src/index.tsx",

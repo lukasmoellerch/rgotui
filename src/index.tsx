@@ -1,8 +1,6 @@
-import { createCliRenderer, LineNumberRenderable, RGBA, SyntaxStyle } from "@opentui/core"
-import { createRoot, useKeyboard } from "@opentui/react"
-import { useEffect, useRef, useState } from "react"
+import { createCliRenderer } from "@opentui/core"
+import { createRoot } from "@opentui/react"
 import { App } from "./app.js"
-
 
 async function main() {
   const renderer = await createCliRenderer()

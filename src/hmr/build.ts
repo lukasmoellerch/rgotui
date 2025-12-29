@@ -3,24 +3,16 @@ import path from 'node:path'
 import type { BunPlugin } from 'bun'
 import * as swc from '@swc/core'
 
-// React Refresh transform plugin for hot reloading using SWC (Rust-based, ~20x faster than Babel)
-// Transforms extension source files to inject $RefreshReg$ and $RefreshSig$ calls
-export const reactRefreshPlugin: BunPlugin = {
+// React Refresh transform plugin using SWC
+const reactRefreshPlugin: BunPlugin = {
   name: 'react-refresh-transform',
   async setup(build) {
     build.onLoad({ filter: /\.[tj]sx?$/ }, async (args) => {
-      // Skip node_modules
-      if (args.path.includes('node_modules')) {
-        return undefined
-      }
-
-      // Skip hmr folder itself to avoid transforming the runtime
-      if (args.path.includes('/hmr/')) {
+      if (args.path.includes('node_modules') || args.path.includes('/hmr/')) {
         return undefined
       }
 
       const code = await Bun.file(args.path).text()
-
       const isTypeScript = args.path.endsWith('.ts') || args.path.endsWith('.tsx')
       const hasJsx = args.path.endsWith('.tsx') || args.path.endsWith('.jsx')
 
@@ -28,18 +20,12 @@ export const reactRefreshPlugin: BunPlugin = {
         filename: args.path,
         jsc: {
           parser: isTypeScript
-            ? {
-                syntax: 'typescript',
-                tsx: hasJsx,
-              }
-            : {
-                syntax: 'ecmascript',
-                jsx: hasJsx,
-              },
+            ? { syntax: 'typescript', tsx: hasJsx }
+            : { syntax: 'ecmascript', jsx: hasJsx },
           transform: {
             react: {
               development: true,
-              refresh: true, // Built-in React Refresh support in SWC
+              refresh: true,
               runtime: 'automatic',
             },
           },
@@ -47,14 +33,7 @@ export const reactRefreshPlugin: BunPlugin = {
         sourceMaps: 'inline',
       })
 
-      if (!result?.code) {
-        return undefined
-      }
-
-      return {
-        contents: result.code,
-        loader: 'js', // SWC transforms JSX to JS
-      }
+      return result?.code ? { contents: result.code, loader: 'js' } : undefined
     })
   },
 }
@@ -68,24 +47,14 @@ export interface BuildResult {
 export async function buildWithHotReload({
   entryPoint,
   outDir,
-  hotReload = true,
 }: {
   entryPoint: string
   outDir: string
-  hotReload?: boolean
 }): Promise<BuildResult> {
   const resolvedEntry = path.resolve(entryPoint)
   const resolvedOutDir = path.resolve(outDir)
 
-  // Ensure output directory exists
-  if (!fs.existsSync(resolvedOutDir)) {
-    fs.mkdirSync(resolvedOutDir, { recursive: true })
-  }
-
-  const plugins: BunPlugin[] = []
-  if (hotReload) {
-    plugins.push(reactRefreshPlugin)
-  }
+  fs.mkdirSync(resolvedOutDir, { recursive: true })
 
   const entryName = path.basename(resolvedEntry, path.extname(resolvedEntry))
 
@@ -94,25 +63,22 @@ export async function buildWithHotReload({
     outdir: resolvedOutDir,
     target: 'bun',
     format: 'esm',
-    plugins,
+    plugins: [reactRefreshPlugin],
     naming: `${entryName}.js`,
     throw: false,
     external: ['@opentui/core', '@opentui/react', 'react', 'react-refresh'],
   })
 
   if (!result.success) {
-    const errorMessage = result.logs.map((log: any) => log.message || log).join('\n')
     return {
       bundlePath: '',
       success: false,
-      error: errorMessage,
+      error: result.logs.map((log: any) => log.message || log).join('\n'),
     }
   }
 
-  const bundlePath = path.join(resolvedOutDir, `${entryName}.js`)
-
   return {
-    bundlePath,
+    bundlePath: path.join(resolvedOutDir, `${entryName}.js`),
     success: true,
   }
 }
