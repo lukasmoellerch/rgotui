@@ -17,3 +17,4 @@ bun install
 bun run start      # Run the app
 bun run dev        # Run with hot reload
 ```
+
