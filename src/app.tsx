@@ -116,6 +116,27 @@ const languageColors: Record<string, string> = {
   powershell: "#012456",
 };
 
+// Map language identifiers to short display names
+const languageDisplayNames: Record<string, string> = {
+  typescript: "ts",
+  javascript: "js",
+  python: "py",
+  ruby: "rb",
+  rust: "rs",
+  csharp: "c#",
+  kotlin: "kt",
+  bash: "sh",
+  markdown: "md",
+  powershell: "ps1",
+  elixir: "ex",
+  erlang: "erl",
+  haskell: "hs",
+  ocaml: "ml",
+  clojure: "clj",
+  matlab: "m",
+  perl: "pl",
+};
+
 // Map file extensions to language identifiers for syntax highlighting
 function getFiletype(path: string): string | undefined {
   const ext = path.split(".").pop()?.toLowerCase();
@@ -177,6 +198,11 @@ function getFiletype(path: string): string | undefined {
   return ext ? extMap[ext] : undefined;
 }
 
+// Get display name for a language (short version)
+function getLanguageDisplayName(filetype: string): string {
+  return languageDisplayNames[filetype] || filetype;
+}
+
 async function copyToClipboard(text: string): Promise<boolean> {
   try {
     const proc = Bun.spawn(["pbcopy"], { stdin: "pipe" });
@@ -236,7 +262,7 @@ function SearchResult({ result, expanded, onToggle }: SearchResultProps) {
           <box flexDirection="row" alignItems="center">
             <text>
               <span fg={languageColors[filetype] || "#7d8590"}>●</span>
-              <span fg="#7d8590"> {filetype}</span>
+              <span fg="#7d8590"> {getLanguageDisplayName(filetype)}</span>
             </text>
             <text>
               <span fg="#7d8590"> {String(matchCount).padStart(2, " ")}</span>
